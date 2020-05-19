@@ -19,17 +19,8 @@ public class FuchuangController {
     @Autowired
     private C2JService c2JService;
 
-    @Autowired
-    private CppImpl cppImpl;
-
-    public interface JnaLibrary extends Library {
-        JnaLibrary JNA_LIBRARY = Native.load("fuchuang", JnaLibrary.class);
-        int get();
-    }
-
     @GetMapping("/")
     public String get(){
-        cppImpl.main();
         return null;
     }
 }

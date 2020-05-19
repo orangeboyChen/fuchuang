@@ -1,6 +1,9 @@
 package com.fuchuang.fuchuang.cpp;
 
+import org.springframework.stereotype.Component;
+
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.stream.Stream;
@@ -11,6 +14,7 @@ import java.util.stream.Stream;
  * @date 2020/5/19 10:28
  */
 
+@Component
 public class CppImpl implements Cpp {
 
     private static final int NODEN = 11       ;           //所有节点数
@@ -25,6 +29,12 @@ public class CppImpl implements Cpp {
     //满载率最小要求（实际上达不到并且不能太高）最大值为 MZ
 
     Scanner scanner = new Scanner(System.in);
+
+    @Override
+    public HashMap<String, Object> get(int[][] graph, int load, int[][] car) {
+        return null;
+    }
+
     class singleroad {               //gene路线参数
         double manzai = 0;
         double lc = 0;

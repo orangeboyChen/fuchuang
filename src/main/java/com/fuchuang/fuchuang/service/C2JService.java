@@ -1,6 +1,8 @@
 package com.fuchuang.fuchuang.service;
 
+import com.fuchuang.fuchuang.cpp.Cpp;
 import com.fuchuang.fuchuang.cpp.CppImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -14,11 +16,12 @@ import java.util.HashMap;
 @Service
 public class C2JService {
 
-    CppImpl cppImpl = new CppImpl();
+    @Autowired
+    private Cpp cpp;
 
 
-    public HashMap<String, Object> get(){
-        cppImpl.main();
+    public HashMap<String, Object> get(int[][] graph, int load, int[][] car){
+        return cpp.get(graph, load, car);
     }
 
 
