@@ -1,5 +1,6 @@
 package com.fuchuang.fuchuang.cpp;
 
+import com.fuchuang.fuchuang.pojo.Node;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -13,25 +14,25 @@ import java.util.Scanner;
  */
 
 @Component
-public class CppImpl implements Cpp {
+public class CppImpl extends Thread {
+    //共享最优解，多线程同步更新
+    private static Result bestRes = new Result(-1.0,99999999,99999999,"");
 
-    private static final int NODEN = 11       ;           //所有节点数
-    private static final int ZQSIZE = 50     ;            //种群大小
-    private static final int MZ = 40      ;               //满载率效能占比
-    private static final int LC = 30  ;                   //总路程效能占比
-    private static final int PR = 30   ;                  //总价格效能占比
-    private static final int ALLMAX = 100000   ;          //作辅助最大
-    private static final int MAXGEN = (NODEN-1)*10  ;     //总遗传代数
-    private static final int PCHANGE = 1000     ;         //单条染色体 单种变异方式 概率倒数
-    private static final int LEAST_REQUEST = 32   ;
+    private static final int MAXNODEN = 100; //最大节点数
+    private int NODEN;           //所有节点数
+    private static int ZQSIZE = 50     ;            //种群大小
+    private int MZ  ;               //满载率效能占比
+    private int LC  ;                   //总路程效能占比
+    private int PR  ;                  //总价格效能占比
+    private static int ALLMAX = 100000   ;          //作辅助最大
+    private static int MAXGEN ;     //总遗传代数
+    private static int PCHANGE = 1000     ;         //单条染色体 单种变异方式 概率倒数
+    private static int LEAST_REQUEST = 32   ;
     //满载率最小要求（实际上达不到并且不能太高）最大值为 MZ
 
-    Scanner scanner = new Scanner(System.in);
+    public boolean running = false;
 
-    @Override
-    public HashMap<String, Object> get(int[][] graph, int load, int[][] car) {
-        return null;
-    }
+   //Scanner scanner = new Scanner(System.in);
 
     class singleroad {               //gene路线参数
         double manzai = 0;
@@ -41,81 +42,206 @@ public class CppImpl implements Cpp {
 
     double linshi[] = new double[ZQSIZE];
     double linshi2[] = new double[ZQSIZE];
-    int xianglin[][] = new int[][]{
-            {0,5,8,7,0,4,12,9,12,6,5},
-            {5,0,4,0,0,0,0,0,0,3,0},
-            {8,4,0,3,0,0,0,0,0,0,0},
-            {7,0,3,0,4,0,0,0,0,0,5},
-            {0,0,0,4,0,3,0,0,0,0,2},
-            {4,0,0,0,3,0,10,0,0,0,2},
-            {12,0,0,0,0,10,0,4,7,0,0},
-            {9,0,0,0,0,0,4,0,5,0,0},
-            {12,0,0,0,0,0,0,5,0,9,0},
-            {6,3,0,0,0,0,0,0,9,0,0},
-            {5,0,0,5,2,2,0,0,0,0,0}
-    };
-    int minroad[][] = new int[NODEN][NODEN];
-    double goodsnumber[] = new double[]{
-            0,1.7,0.8,1.3,2.8,1.9,3.5,0.9,0.3,1.2,0
-    };
 
-    String strs[] = new String[50];
-    String strs2[] = new String[50];
-    String strs3[] = new String[50];
-    String strs4[] = new String[50];
+    int xianglin[][];  //邻接表
+    int minroad[][];
+    float goodsnumber[];
+
+    String strs[] = new String[105];
+    String strs2[] = new String[105];
+    String strs3[] = new String[105];
+    String strs4[] = new String[105];
 
 
-
-
-    //    double linshi[ZQSIZE] = { 0 };    //用作辅助计算
-//    double linshi2[ZQSIZE] = { 0 };   //用作辅助计算
-//    int xianglin[NODEN][NODEN] = {    //邻接路
-//        {0,5,8,7,0,4,12,9,12,6,5},
-//        {5,0,4,0,0,0,0,0,0,3,0},
-//        {8,4,0,3,0,0,0,0,0,0,0},
-//        {7,0,3,0,4,0,0,0,0,0,5},
-//        {0,0,0,4,0,3,0,0,0,0,2},
-//        {4,0,0,0,3,0,10,0,0,0,2},
-//        {12,0,0,0,0,10,0,4,7,0,0},
-//        {9,0,0,0,0,0,4,0,5,0,0},
-//        {12,0,0,0,0,0,0,5,0,9,0},
-//        {6,3,0,0,0,0,0,0,9,0,0},
-//        {5,0,0,5,2,2,0,0,0,0,0}
-//    };
-//    int minroad[NODEN][NODEN] = { 0 };      //最小路
-//    double goodsnumber[NODEN] = {          //货物量
-//        0,1.7,0.8,1.3,2.8,1.9,3.5,0.9,0.3,1.2,0
-//    };
     static int fuzhu = 0;            //用作辅助计算
     static int fuzhu2 = 0;           //用作辅助计算
-    //    String strs[50] = { "" };        //用作辅助计算（用于切割字符串）
-//    String strs2[50] = { "" };       //用作辅助计算（用于切割字符串）
-//    String strs3[50] = { "" };       //用作辅助计算（用于切割字符串）
-//    String strs4[50] = { "" };       //用作辅助计算（用于切割字符串）
+
     static String fuzhubianyi = "";        //辅助gene变异
     int carclass = 0;                        //车辆种类
-    double[] carmax = new double[10];                     //车辆最大限制
-    double[] carroad = new double[10];                 //车辆最大里程
-    int[] carprice = new int[10];                   //车辆费用
+    float[] carmax;                     //车辆最大限制
+    float[] carroad;                 //车辆最大里程
+    int[] carprice;                  //车辆费用
     static int minprice = ALLMAX;          //最小价格
     static int minlength = ALLMAX;         //最小路程
 
-    static singleroad[][] manzailv = new singleroad[ZQSIZE][NODEN];
-//    static singleroad manzailv[ZQSIZE][NODEN] = { 0 };//满载率
+    static singleroad[][] manzailv = new singleroad[ZQSIZE][MAXNODEN];
 
     static double[][] canshu = new double[3][ZQSIZE];      //参数和适应度（canshu[0]表示路程  canshu[1]表示总价格）
-
-//    static double canshu[3][ZQSIZE] = { 0 };          //参数和适应度（canshu[0]表示路程  canshu[1]表示总价格）
 
     static String[] fudai = new String[ZQSIZE];
     static String[] zidai = new String[ZQSIZE];
 
-    //    static String fudai[ZQSIZE] = { "" };             //用于存储染色体
-//    static String zidai[ZQSIZE] = { "" };             //用于存储染色体
     int bianyicishu = 0;
 
-    void init(int carclass, double[] carmax, double[] carroad, int[] carprice) {       //初始化参数
+    public static Result getBestRes(){
+        return  bestRes;
+    }
 
+    @Override
+    public void run() {
+        //线程运行中
+        running = true;
+
+        //初始化参数
+        init();
+
+        //产生父代
+        createf(fudai, carclass);
+
+        //计算适应度
+        shiyingdujisuan(fudai);
+
+        //遗传迭代
+        for (int i = 0; i < MAXGEN; i++) {
+            if (i % 2 != 0) {
+                zidaishengchengqi(zidai, fudai);
+                clear();
+                shiyingdujisuan(fudai);
+                floyd();
+                yichuanbianyi(fudai);
+            }
+            else {
+                zidaishengchengqi(fudai, zidai);
+                clear();
+                shiyingdujisuan(zidai);
+                floyd();
+                yichuanbianyi(zidai);
+            }
+        }
+
+        //处理结果
+        Result result;
+        String[] T1, T2;
+        if (MAXGEN % 2 != 0) {
+            T1 = zidai.clone();
+            T2 = fudai.clone();
+        }
+        else {
+            T1 = fudai.clone();
+            T2 = zidai.clone();
+            /*zidaishengchengqi(fudai, zidai);
+            clear();
+            shiyingdujisuan(zidai);
+            int cy = zuiyou();
+            if (cy != -1) {
+                System.out.println("最终的最优解是" + zidai[cy]);
+
+                for (int i = 0; i < NODEN; i++) {
+                    if (manzailv[cy][i].manzai != 0) {
+                        System.out.println("路线参数为：" + 100 * manzailv[cy][i].manzai / MZ + "(" + manzailv[cy][i].lc + ")");
+                    }
+                }
+                System.out.println("总路程" + canshu[0][cy] + " " + shiyingdu((int) canshu[0][cy], minlength));
+                System.out.println("总价格" + canshu[1][cy] + " " + shiyingdu((int) canshu[1][cy], minprice));
+                System.out.println("总评价" + canshu[2][cy]);
+
+            }
+            else {
+                System.out.println("抱歉最终没有得到最优解");
+            }
+
+
+            for (int i = 0; i < ZQSIZE; i++) {
+                System.out.println(zidai[i]);
+                for (int k = 0; k < NODEN; k++) {
+                    if (manzailv[i][k].lc != 0) {
+                        System.out.println(100 * manzailv[i][k].manzai / MZ + "(" + manzailv[i][k].lc + ") ");
+                    }
+                    else {
+                        break;
+                    }
+                }
+                System.out.println("\n");
+            }*/
+        }
+        //zidaishengchengqi(zidai, fudai);
+        zidaishengchengqi(T1, T2);
+        clear();
+        //shiyingdujisuan(fudai);
+        shiyingdujisuan(T2);
+        int cy = zuiyou();
+        if (cy != -1) {
+            /*System.out.println("最终的最优解是" + fudai[cy]);
+            System.out.println("最终的最优解是" + T2[cy]);
+
+            for (int i = 0; i < NODEN; i++) {
+                if (manzailv[cy][i].manzai != 0) {
+                    System.out.println("路线参数为：" + 100 * manzailv[cy][i].manzai / MZ + "(" + manzailv[cy][i].lc + ")");
+                }
+            }
+            System.out.println("总路程" + canshu[0][cy] + " " + shiyingdu((int) canshu[0][cy], minlength));
+            System.out.println("总价格" + canshu[1][cy] + " " + shiyingdu((int) canshu[1][cy], minprice));
+            System.out.println("总评价" + canshu[2][cy]);*/
+            shiyingdu((int) canshu[0][cy], minlength);
+            shiyingdu((int) canshu[1][cy], minprice);
+            result = new Result(canshu[2][cy], minprice, minlength, T2[cy]);
+            updateBestRes(result);    //更新最优解
+        }
+
+        Solve.finishedCnt ++;
+
+        /*for (int i = 0; i < ZQSIZE; i++) {
+            //System.out.println(fudai[i]);
+            System.out.println(T2[i]);
+            for (int k = 0; k < NODEN; k++) {
+                if (manzailv[i][k].lc != 0) {
+                    System.out.println(100 * manzailv[i][k].manzai / MZ + "(" + manzailv[i][k].lc + ")" + " ");
+                }
+                else {
+                    break;
+                }
+            }
+            System.out.println("\n");
+        }*/
+    }
+
+
+    //同步更新最优解
+    private synchronized void updateBestRes(Result res){
+        if(bestRes.getEvaluation() < res.getEvaluation()){
+            bestRes = res;
+        }
+    }
+
+    public void setAll(int vCnt, int[][] graph, int[] demand,    //顶点数 边长邻接表 需求表
+                                       int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad,  //车辆种类数量 车的费用 车的最大里程数 车的最大装载量
+                                       int affectFullLoad, int affectSumDis, int affectSumCost,//满载率影响参数 总路程影响参数 总费用影响参数
+                                       int fixTimeCost, int carVel){        //每个点的固定卸货时间， 车辆速度
+
+
+
+        NODEN = vCnt;
+        carclass = carCnt;
+        MAXGEN = (NODEN-1)*10;
+        MZ = affectFullLoad;
+        LC = affectSumDis;
+        PR = affectSumCost;
+
+        xianglin = new int[NODEN + 5][NODEN + 5];
+        minroad = new int[NODEN + 5][NODEN + 5];
+        goodsnumber = new float[NODEN + 5];
+        carmax = new float[carclass + 5];
+        carroad = new float[carclass + 5];
+        carprice = new int[carclass + 5];
+
+        for(int i = 0; i < NODEN; i++) {
+            goodsnumber[i] = demand[i];
+            for(int j = 0; j < NODEN; j++){
+                xianglin[i][j] = graph[i][j];
+            }
+        }
+
+        for(int i = 0; i < carCnt; i++){
+            carmax[i] = carMaxLoad[i];
+            carroad[i] = carMaxDis[i];
+            carprice[i] = carCost[i];
+        }
+    }
+
+
+
+    void init() {       //初始化参数
+        floyd();
         for (int i = 0; i < ZQSIZE; i++){
             fudai[i] = "";
             zidai[i] = "";
@@ -124,7 +250,7 @@ public class CppImpl implements Cpp {
             canshu[2][i] = 0;
             linshi[i] = 0;
             linshi2[i] = 0;
-            if(i < 50){
+            if(i < 105){
                 strs[i] = "";
                 strs2[i] = "";
                 strs3[i] = "";
@@ -135,22 +261,6 @@ public class CppImpl implements Cpp {
                 manzailv[i][j] = new singleroad();
             }
         }
-
-        System.out.println("请输入车辆种类");
-        this.carclass =  Integer.parseInt(scanner.next());
-        System.out.println("请输入车辆最大载货量");
-        for (int i = 0; i < this.carclass; i++) {
-            this.carmax[i] = Integer.parseInt(scanner.next());
-        }
-        System.out.println("请输入车辆最大里程数");
-        for (int i = 0; i < this.carclass; i++) {
-            this.carroad[i] = Integer.parseInt(scanner.next());
-        }
-        System.out.println("请输入车辆费用");
-        for (int i = 0; i < this.carclass; i++) {
-            this.carprice[i] = Integer.parseInt(scanner.next());
-        }
-        return;
     }
 
     void floyd() {
@@ -253,28 +363,7 @@ public class CppImpl implements Cpp {
         return;
     }
 
-    int split(String strr, char c, String[] s) {            //字符串分割  把str 按 c 分割，保存在 s[50] 中，返回分割段数，常常用strs[50] strs2[50] strs3[50] strs4[50] 作保存数组
-        int zhizhen = 0;
-        char[] str = strr.toCharArray();
-        String zifuchuan = "";
-        for (int i = 0; i < str.length; i++) {
-            if (str[i] == c) {
-                s[zhizhen] = zifuchuan;
-                zifuchuan = "";
-                zhizhen++;
-            }
-            else if (i == (str.length - 1)) {
-                zifuchuan += str[i];
-                s[zhizhen] = zifuchuan;
-                zifuchuan = "";
-                zhizhen++;
-            }
-            else {
-                zifuchuan += str[i];
-            }
-        }
-        return zhizhen;
-    }
+
 
     void shiyingdujisuan(String[] shuzu) {                  //用于计算适应度 最终结果：manzailv[ZQSIZE][NODEN]  中保存着染色体每个gene的参数
         int zongjia = 0;                                            //                            (满载率评价)（gene路线长度）（gene所用车辆）
@@ -288,9 +377,9 @@ public class CppImpl implements Cpp {
         for (int i = 0; i < ZQSIZE; i++) {
             zongjia = 0;
             zonglucheng = 0;
-            int shu = split(shuzu[i], '#', strs);
+            int shu = MyUtil.split(shuzu[i], '#', strs);
             for (int k = 0; k < shu; k++) {
-                int nei = split(strs[k], '-', strs2);
+                int nei = MyUtil.split(strs[k], '-', strs2);
                 manzai = 0;
                 zongjia += carprice[strs2[0].charAt(0) - 'A'];              //累计总价
                 manzailv[i][k].car = strs2[0].charAt(0) - 'A';              //记录车辆
@@ -371,10 +460,10 @@ public class CppImpl implements Cpp {
         s1 = String.valueOf(fuzhu);
 
         s2 = String.valueOf(fuzhu2);
-        int shu = split(a, '#', strs);
+        int shu = MyUtil.split(a, '#', strs);
         int nei = 0;
         for (int i = 0; i < shu; i++) {
-            nei = split(strs[i], '-', strs2);
+            nei = MyUtil.split(strs[i], '-', strs2);
             for (int k = 1; k < (nei - 1); k++) {
                 if (strs2[k] == s1) {
                     strs2[k] = s2;
@@ -465,7 +554,7 @@ public class CppImpl implements Cpp {
         Random r = new Random(System.currentTimeMillis());
         char[] a = aa.toCharArray();
         fuzhubianyi = "";
-        int shu = split(aa, '#', strs);
+        int shu = MyUtil.split(aa, '#', strs);
         fuzhu = r.nextInt(32767) % shu + 1;
         fuzhu2 = r.nextInt(32767) % carclass;
         int jishu = 0;
@@ -488,18 +577,18 @@ public class CppImpl implements Cpp {
         //模拟交叉感染（染色体中gene评价最高的作为一个基因，另一条染色体中删除此段gene中的节点然后加入到此gene末尾）
         Random r = new Random(System.currentTimeMillis());
 
-        fuzhu = split(shuzu[a], '#', strs);
-        fuzhu2 = split(shuzu[b], '#', strs2);
+        fuzhu = MyUtil.split(shuzu[a], '#', strs);
+        fuzhu2 = MyUtil.split(shuzu[b], '#', strs2);
         fuzhubianyi = "";
 
         int shu = r.nextInt(32767) % fuzhu;
         fuzhubianyi += strs[shu];
-        int jiaochagene = split(strs[shu], '-', strs3);
+        int jiaochagene = MyUtil.split(strs[shu], '-', strs3);
         String pianduan = "";
         int genelength = 0;
         for (int i = 0; i < fuzhu2; i++) {
             pianduan = "";
-            genelength = split(strs2[i], '-', strs4);
+            genelength = MyUtil.split(strs2[i], '-', strs4);
             pianduan += strs4[0] + '-';
             for (int k = 1; k < genelength - 1; k++) {
                 for (int p = 1; p < jiaochagene - 1; p++) {
@@ -521,10 +610,10 @@ public class CppImpl implements Cpp {
         String fuzhubianyi2 = "";
         shu = r.nextInt(32767) % fuzhu2;
         fuzhubianyi2 += strs2[shu];
-        jiaochagene = split(strs2[shu], '-', strs3);
+        jiaochagene = MyUtil.split(strs2[shu], '-', strs3);
         for (int i = 0; i < fuzhu; i++) {
             pianduan = "";
-            genelength = split(strs[i], '-', strs4);
+            genelength = MyUtil.split(strs[i], '-', strs4);
             pianduan += strs4[0] + '-';
             for (int k = 1; k < genelength - 1; k++) {
                 for (int p = 1; p < jiaochagene - 1; p++) {
@@ -576,7 +665,7 @@ public class CppImpl implements Cpp {
             }
             max = 0;
             yn = 0;
-            fuzhu = split(shuzu[ranseti], '#', strs);
+            fuzhu = MyUtil.split(shuzu[ranseti], '#', strs);
             for (int k = 1; k < NODEN; k++) {
                 linshi[k] = 0;
             }
@@ -584,7 +673,7 @@ public class CppImpl implements Cpp {
             for (int k = 0; k < fuzhu; k++) {
                 if (manzailv[ranseti][k].manzai > LEAST_REQUEST && manzailv[ranseti][k].lc != ALLMAX) {  //所有满载率评价大于 LESSREQUEST 的gene直接遗传
                     next[i] += strs[k] + '#';
-                    fuzhu2 = split(strs[k], '-', strs2);
+                    fuzhu2 = MyUtil.split(strs[k], '-', strs2);
                     for (int p = 1; p < fuzhu2 - 1; p++) {
                         fuzhu3 = Integer.parseInt(strs2[p]);
                         linshi[fuzhu3] = 1;
@@ -597,7 +686,7 @@ public class CppImpl implements Cpp {
             }
             if (yn == 0 && max != -1) {                                                     //如果2中没有符合要求的染色体那么将满载率评价最高的gene加入子代染色体
                 next[i] += strs[max] + '#';
-                fuzhu2 = split(strs[max], '-', strs2);
+                fuzhu2 = MyUtil.split(strs[max], '-', strs2);
                 for (int p = 1; p < fuzhu2 - 1; p++) {
                     fuzhu3 = Integer.parseInt(strs2[p]);
                     linshi[fuzhu3] = 1;
@@ -711,106 +800,6 @@ public class CppImpl implements Cpp {
         }
         return;
     }
-
-    public int main()
-    {
-        floyd();
-        init(carclass, carmax, carroad, carprice);
-        createf(fudai, carclass);
-        shiyingdujisuan(fudai);
-        floyd();
-        for (int i = 0; i < MAXGEN; i++) {
-            if (i % 2 != 0) {
-                zidaishengchengqi(zidai, fudai);
-                clear();
-                shiyingdujisuan(fudai);
-                floyd();
-                yichuanbianyi(fudai);
-            }
-            else {
-                zidaishengchengqi(fudai, zidai);
-                clear();
-                shiyingdujisuan(zidai);
-                floyd();
-                yichuanbianyi(zidai);
-            }
-        }
-        if (MAXGEN % 2 != 0) {
-            zidaishengchengqi(zidai, fudai);
-            clear();
-            shiyingdujisuan(fudai);
-            int cy = zuiyou();
-            if (cy != -1) {
-                System.out.println("最终的最优解是" + fudai[cy]);
-
-                for (int i = 0; i < NODEN; i++) {
-                    if (manzailv[cy][i].manzai != 0) {
-                        System.out.println("路线参数为：" + 100 * manzailv[cy][i].manzai / MZ + "(" + manzailv[cy][i].lc + ")");
-                    }
-                }
-                System.out.println("总路程" + canshu[0][cy] + " " + shiyingdu((int) canshu[0][cy], minlength));
-                System.out.println("总价格" + canshu[1][cy] + " " + shiyingdu((int) canshu[1][cy], minprice));
-                System.out.println("总评价" + canshu[2][cy]);
-            }
-            else {
-                System.out.println("抱歉最终没有得到最优解");
-            }
-
-            for (int i = 0; i < ZQSIZE; i++) {
-                System.out.println(fudai[i]);
-                for (int k = 0; k < NODEN; k++) {
-                    if (manzailv[i][k].lc != 0) {
-                        System.out.println(100 * manzailv[i][k].manzai / MZ + "(" + manzailv[i][k].lc + ")" + " ");
-                    }
-                    else {
-                        break;
-                    }
-                }
-                System.out.println("\n");
-            }
-        }
-        else {
-            zidaishengchengqi(fudai, zidai);
-            clear();
-            shiyingdujisuan(zidai);
-            int cy = zuiyou();
-            if (cy != -1) {
-                System.out.println("最终的最优解是" + zidai[cy]);
-
-                for (int i = 0; i < NODEN; i++) {
-                    if (manzailv[cy][i].manzai != 0) {
-                        System.out.println("路线参数为：" + 100 * manzailv[cy][i].manzai / MZ + "(" + manzailv[cy][i].lc + ")");
-                    }
-                }
-                System.out.println("总路程" + canshu[0][cy] + " " + shiyingdu((int) canshu[0][cy], minlength));
-                System.out.println("总价格" + canshu[1][cy] + " " + shiyingdu((int) canshu[1][cy], minprice));
-                System.out.println("总评价" + canshu[2][cy]);
-
-            }
-            else {
-                System.out.println("抱歉最终没有得到最优解");
-            }
-
-
-            for (int i = 0; i < ZQSIZE; i++) {
-                System.out.println(zidai[i]);
-                for (int k = 0; k < NODEN; k++) {
-                    if (manzailv[i][k].lc != 0) {
-                        System.out.println(100 * manzailv[i][k].manzai / MZ + "(" + manzailv[i][k].lc + ") ");
-                    }
-                    else {
-                        break;
-                    }
-                }
-                System.out.println("\n");
-            }
-        }
-        System.out.println("变异次数" + bianyicishu);
-        System.out.println("最短路程" + minlength);
-        System.out.println("最小价格" + minprice);
-        return 0;
-    }
-
 
 }
 
