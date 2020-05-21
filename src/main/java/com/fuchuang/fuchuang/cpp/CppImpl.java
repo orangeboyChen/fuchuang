@@ -2,11 +2,9 @@ package com.fuchuang.fuchuang.cpp;
 
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.stream.Stream;
 
 /**
  * @author orangeboy
@@ -25,7 +23,7 @@ public class CppImpl implements Cpp {
     private static final int ALLMAX = 100000   ;          //作辅助最大
     private static final int MAXGEN = (NODEN-1)*10  ;     //总遗传代数
     private static final int PCHANGE = 1000     ;         //单条染色体 单种变异方式 概率倒数
-    private static final int LEASTREQUEST = 32   ;
+    private static final int LEAST_REQUEST = 32   ;
     //满载率最小要求（实际上达不到并且不能太高）最大值为 MZ
 
     Scanner scanner = new Scanner(System.in);
@@ -584,7 +582,7 @@ public class CppImpl implements Cpp {
             }
             int  fuzhu3 = 0;
             for (int k = 0; k < fuzhu; k++) {
-                if (manzailv[ranseti][k].manzai > LEASTREQUEST && manzailv[ranseti][k].lc != ALLMAX) {  //所有满载率评价大于 LESSREQUEST 的gene直接遗传
+                if (manzailv[ranseti][k].manzai > LEAST_REQUEST && manzailv[ranseti][k].lc != ALLMAX) {  //所有满载率评价大于 LESSREQUEST 的gene直接遗传
                     next[i] += strs[k] + '#';
                     fuzhu2 = split(strs[k], '-', strs2);
                     for (int p = 1; p < fuzhu2 - 1; p++) {
