@@ -68,7 +68,7 @@ public class FuChuangController {
 
 
         //需求
-        int[] demand = new int[nodes.length];
+        double[] demand = new double[nodes.length];
         for (int i = 0; i < demand.length; i++) {
             demand[i] = nodes[i].getNeed();
         }
@@ -76,8 +76,8 @@ public class FuChuangController {
 
         //车辆三要素
         int[] truckFee = new int[trucks.length];
-        int[] truckDistance = new int[trucks.length];
-        int[] truckLoad = new int[trucks.length];
+        double[] truckDistance = new double[trucks.length];
+        double[] truckLoad = new double[trucks.length];
         for (int i = 0; i < trucks.length; i++) {
             truckFee[i] = trucks[i].getCost();
             truckDistance[i] = trucks[i].getDistance();

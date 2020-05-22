@@ -2,6 +2,7 @@ package com.fuchuang.fuchuang.service;
 
 import com.fuchuang.fuchuang.cpp.Cpp;
 import com.fuchuang.fuchuang.cpp.CppImpl;
+import com.fuchuang.fuchuang.cpp.CppImpl2;
 import com.fuchuang.fuchuang.pojo.Result;
 import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.stereotype.Service;
@@ -37,13 +38,13 @@ public class C2JService {
      * @param carVel 车辆速度
      * @return 最好的结果
      */
-    public Result solve(int vCnt, int[][] graph, int[] demand, int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) throws InterruptedException, ExecutionException, TimeoutException
+    public Result solve(int vCnt, int[][] graph, double[] demand, int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) throws InterruptedException, ExecutionException, TimeoutException
     {
         List<FutureTask<Result>> futureTasks = new ArrayList<>(taskCount);
         ExecutorService executorService = Executors.newFixedThreadPool(taskCount);
 
         Callable<Result> callable = () -> {
-            Cpp cpp = new CppImpl();
+            Cpp cpp = new CppImpl2();
             return cpp.solve(vCnt, graph, demand, carCnt, carCost, carMaxDis, carMaxLoad, affectFullLoad, affectSumDis, affectSumCost, fixTimeCost, carVel);
         };
 
@@ -65,7 +66,6 @@ public class C2JService {
         }
 
         return bestResult;
-
     }
 
 

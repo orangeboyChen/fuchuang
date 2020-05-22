@@ -23,11 +23,11 @@ public class Result implements Comparable {
 
     }
 
+    @ToString
     class Route{
         int carType;
-        List<Integer> route;
+        List<Integer> route = new ArrayList<>();
         public  Route(String route){
-            assert false;
             this.route.clear();
             String[] tmp = new String[105];
             int vertexCntPlus2 = MyUtil.split(route, '-', tmp);
@@ -47,7 +47,6 @@ public class Result implements Comparable {
         this.sumCost = sumCost;
         this.sumDis = sumDis;
 
-        assert false;
         routes.clear();
         if("".equals(route)) {
             return;

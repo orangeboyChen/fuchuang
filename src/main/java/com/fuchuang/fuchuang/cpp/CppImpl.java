@@ -13,7 +13,7 @@ import java.util.Random;
  */
 
 
-public class CppImpl implements Cpp {
+public class CppImpl {
     /**
      * 返回的结果
      */
@@ -72,7 +72,7 @@ public class CppImpl implements Cpp {
 
     public boolean isRunning = false;
 
-    @Override
+//    @Override
     public Result solve(int vCnt, int[][] graph, int[] demand, int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) {
         this.setAll(vCnt, graph, demand, carCnt, carCost, carMaxDis, carMaxLoad, affectFullLoad, affectSumDis, affectSumCost, fixTimeCost, carVel);
         return this.startCalc();
@@ -850,7 +850,7 @@ public class CppImpl implements Cpp {
      */
     int bestSolutionCalc() {
         double max = 0;
-        int yn = 0, zhizhen = -1;
+        int yn = 0, zhizhen = 0;
         for (int i = 0; i < POPULATION_SIZE; i++) {
             for (int k = 0; k < nodeSum; k++) {
                 if ((ratioOfFullLoad[i][k].manzai != 0 && ratioOfFullLoad[i][k].lc == INF) || (!(ratioOfFullLoad[i][k].manzai != 0) && ratioOfFullLoad[i][k].lc != 0)) { //gene载货评价不为0，gene路程不超限

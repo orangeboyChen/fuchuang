@@ -25,8 +25,8 @@ public interface Cpp {
      * @param carVel 车辆速度
      * @return 最好的结果
      */
-    public Result solve(int vCnt, int[][] graph, int[] demand,
-                        int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad,
+    public Result solve(int vCnt, int[][] graph, double[] demand,
+                        int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
                         int affectFullLoad, int affectSumDis, int affectSumCost,
                         int fixTimeCost, int carVel);
 }
