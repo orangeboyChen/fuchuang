@@ -35,14 +35,18 @@ class CppImplTest {
             3,3.5,0.8,4,2.8,1.9,3.5,0.9,0.8,1.2,4.9
     };
 
+    int[] demand2 = new int[]{
+            3,3,1,4,2,1,3,1,1,1,4
+    };
+
     @Test
     void solve() {
 
 
-//        Cpp cpp = new CppImpl();
-//        System.out.println(cpp.solve(11, graph, demand,
-//                2, new int[]{200, 400}, new double[]{35, 35}, new double[]{2, 5},
-//                40, 30, 30, 0, 0));
+        CppImpl cpp = new CppImpl();
+        System.out.println(cpp.solve(11, graph, demand2,
+                2, new int[]{200, 400}, new int[]{35, 35}, new int[]{2, 5},
+                40, 30, 30, 0, 0));
     }
 
     @Test
