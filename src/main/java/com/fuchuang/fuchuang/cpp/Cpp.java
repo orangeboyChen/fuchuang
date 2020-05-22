@@ -1,6 +1,6 @@
 package com.fuchuang.fuchuang.cpp;
 
-import java.util.HashMap;
+import com.fuchuang.fuchuang.pojo.Result;
 
 /**
  * @author orangeboy
@@ -9,8 +9,24 @@ import java.util.HashMap;
  */
 
 public interface Cpp {
-    public Result get(int vCnt, int[][] graph, int[] demand,    //顶点数 边长邻接表 需求表
-                                       int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad,  //车辆种类数量 车的费用 车的最大里程数 车的最大装载量
-                                       int affectFullLoad, int affectSumDis, int affectSumCost,//满载率影响参数 总路程影响参数 总费用影响参数
-                                       int fixTimeCost, int carVel);        //每个点的固定卸货时间， 车辆速度
+    /**
+     * 通过算法获得解
+     * @param vCnt 顶点数
+     * @param graph 边长邻接表
+     * @param demand 需求表
+     * @param carCnt 车辆种类数量
+     * @param carCost 车的费用
+     * @param carMaxDis 车的最大里程数
+     * @param carMaxLoad 车的最大装载量
+     * @param affectFullLoad 满载率影响参数
+     * @param affectSumDis 总路程影响参数
+     * @param affectSumCost 总费用影响参数
+     * @param fixTimeCost 每个点的固定卸货时间
+     * @param carVel 车辆速度
+     * @return 最好的结果
+     */
+    public Result solve(int vCnt, int[][] graph, int[] demand,
+                        int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad,
+                        int affectFullLoad, int affectSumDis, int affectSumCost,
+                        int fixTimeCost, int carVel);
 }

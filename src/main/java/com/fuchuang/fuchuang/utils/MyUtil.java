@@ -1,5 +1,11 @@
-package com.fuchuang.fuchuang.cpp;
+package com.fuchuang.fuchuang.utils;
 
+import com.fuchuang.fuchuang.pojo.Result;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import org.springframework.stereotype.Component;
+
+@Component
 public class MyUtil {
     public  static int split(String strr, char c, String[] s) {            //字符串分割  把str 按 c 分割，保存在 s[50] 中，返回分割段数，常常用strs[50] strs2[50] strs3[50] strs4[50] 作保存数组
         int zhizhen = 0;
@@ -22,5 +28,17 @@ public class MyUtil {
             }
         }
         return zhizhen;
+    }
+
+
+    @AllArgsConstructor
+    public class ApiVO<T>{
+        private int status;
+        private String message;
+        private T data;
+    }
+
+    public ApiVO<Result> success(Result result){
+        return new ApiVO<Result>(200, null, result);
     }
 }

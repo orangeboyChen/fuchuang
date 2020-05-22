@@ -10,6 +10,6 @@ import lombok.Data;
 @Data
 public class Truck {
     private int load;
-    private int mile;
-    private int fee;
+    private int distance;
+    private int cost;
 }

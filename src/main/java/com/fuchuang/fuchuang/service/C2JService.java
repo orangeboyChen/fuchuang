@@ -2,10 +2,13 @@ package com.fuchuang.fuchuang.service;
 
 import com.fuchuang.fuchuang.cpp.Cpp;
 import com.fuchuang.fuchuang.cpp.CppImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.fuchuang.fuchuang.pojo.Result;
+import org.apache.catalina.filters.RemoteIpFilter;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.*;
 
 /**
  * @author orangeboy
@@ -16,12 +19,53 @@ import java.util.HashMap;
 @Service
 public class C2JService {
 
-    @Autowired
-    private Cpp cpp;
+    private final int taskCount = 5;
 
+    /**
+     * 通过算法获得解
+     * @param vCnt 顶点数
+     * @param graph 边长邻接表
+     * @param demand 需求表
+     * @param carCnt 车辆种类数量
+     * @param carCost 车的费用
+     * @param carMaxDis 车的最大里程数
+     * @param carMaxLoad 车的最大装载量
+     * @param affectFullLoad 满载率影响参数
+     * @param affectSumDis 总路程影响参数
+     * @param affectSumCost 总费用影响参数
+     * @param fixTimeCost 每个点的固定卸货时间
+     * @param carVel 车辆速度
+     * @return 最好的结果
+     */
+    public Result solve(int vCnt, int[][] graph, int[] demand, int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) throws InterruptedException, ExecutionException, TimeoutException
+    {
+        List<FutureTask<Result>> futureTasks = new ArrayList<>(taskCount);
+        ExecutorService executorService = Executors.newFixedThreadPool(taskCount);
 
-    public HashMap<String, Object> get(int[][] graph, int load, int[][] car){
-        return cpp.get(graph, load, car);
+        Callable<Result> callable = () -> {
+            Cpp cpp = new CppImpl();
+            return cpp.solve(vCnt, graph, demand, carCnt, carCost, carMaxDis, carMaxLoad, affectFullLoad, affectSumDis, affectSumCost, fixTimeCost, carVel);
+        };
+
+        for (int i = 0; i < taskCount; i++) {
+            FutureTask<Result> futureTask = new FutureTask<>(callable);
+            futureTasks.add(futureTask);
+            executorService.submit(futureTask);
+        }
+
+        //最好的结果
+        Result bestResult = new Result();
+
+        //结果比较
+        for (FutureTask<Result> executedTask : futureTasks) {
+            Result executedResult = executedTask.get(6, TimeUnit.SECONDS);
+            if(bestResult.compareTo(executedResult) < 0){
+                bestResult = executedResult;
+            }
+        }
+
+        return bestResult;
+
     }
 
 
