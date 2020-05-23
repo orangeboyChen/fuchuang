@@ -37,7 +37,7 @@ public class CppImpl2 implements Cpp {
 
     double linshi[] = new double[ZQSIZE];
     double linshi2[] = new double[ZQSIZE];
-    int xianglin[][] = new int[][]{
+    double xianglin[][] = new double[][]{
             {0,5,8,7,0,4,12,9,12,6,5},
             {5,0,4,0,0,0,0,0,0,3,0},
             {8,4,0,3,0,0,0,0,0,0,0},
@@ -50,7 +50,7 @@ public class CppImpl2 implements Cpp {
             {6,3,0,0,0,0,0,0,9,0,0},
             {5,0,0,5,2,2,0,0,0,0,0}
     };
-    int minroad[][] = new int[NODEN][NODEN];
+    double minroad[][] = new double[NODEN][NODEN];
     double goodsnumber[] = new double[]{
             0,1.7,0.8,1.3,2.8,1.9,3.5,0.9,0.3,1.2,0
     };
@@ -675,9 +675,11 @@ public class CppImpl2 implements Cpp {
     void clear() {                                      //清空manzailv[][] 和 canshu[][]
         for (int i = 0; i < manzailv.length; i++) {
             for (int j = 0; j < manzailv[0].length; j++) {
-                manzailv[i][j].car = 0;
-                manzailv[i][j].lc = 0;
-                manzailv[i][j].manzai = 0;
+                if(manzailv[i][j] != null){
+                    manzailv[i][j].car = 0;
+                    manzailv[i][j].lc = 0;
+                    manzailv[i][j].manzai = 0;
+                }
             }
             canshu[0][i] = 0;
             canshu[1][i] = 0;
@@ -716,7 +718,7 @@ public class CppImpl2 implements Cpp {
     }
 
     @Override
-    public Result solve(int vCnt, int[][] graph, double[] demand,
+    public Result solve(int vCnt, double[][] graph, double[] demand,
                         int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
                         int affectFullLoad, int affectSumDis, int affectSumCost,
                         int fixTimeCost, int carVel)
@@ -842,9 +844,9 @@ public class CppImpl2 implements Cpp {
                 // System.out.println("\n");
             }
         }
-        // System.out.println("变异次数" + bianyicishu);
-        // System.out.println("最短路程" + minlength);
-        // System.out.println("最小价格" + minprice);
+         System.out.println("变异次数" + bianyicishu);
+         System.out.println("最短路程" + minlength);
+         System.out.println("最小价格" + minprice);
 
 
         //解析路程

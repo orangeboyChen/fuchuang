@@ -54,7 +54,7 @@ public class FuChuangController {
         //获取图
         JSONArray graphJSON = jsonObject.getJSONArray(GRAPH);
         int length = graphJSON.size();
-        int[][] graph = new int[length][length];
+        double[][] graph = new double[length][length];
         for (int i = 0; i < length; i++) {
             for(int j = 0; j < length; j++){
                 graph[i][j] = graphJSON.getJSONArray(i).getIntValue(j);
