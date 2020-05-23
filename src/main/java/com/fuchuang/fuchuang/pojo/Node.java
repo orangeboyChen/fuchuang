@@ -13,6 +13,6 @@ import java.io.Serializable;
 @Data
 public class Node implements Serializable {
     private String name;
-    private int need;
+    private double need;
 
 }

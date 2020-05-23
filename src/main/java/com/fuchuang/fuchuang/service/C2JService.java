@@ -20,7 +20,7 @@ import java.util.concurrent.*;
 @Service
 public class C2JService {
 
-    private final int taskCount = 5;
+    private final int taskCount = 50;
 
     /**
      * 通过算法获得解
@@ -59,12 +59,21 @@ public class C2JService {
 
         //结果比较
         for (FutureTask<Result> executedTask : futureTasks) {
-            Result executedResult = executedTask.get(6, TimeUnit.SECONDS);
+
+            Result executedResult;
+            try{
+                executedResult = executedTask.get(6, TimeUnit.SECONDS);
+            }catch (TimeoutException e){
+                System.out.println("线程运行异常");
+                executedResult = new Result();
+            }
+
             if(bestResult.compareTo(executedResult) < 0){
                 bestResult = executedResult;
             }
-        }
 
+        }
+        System.out.println(bestResult);
         return bestResult;
     }
 

@@ -57,7 +57,7 @@ public class FuChuangController {
         double[][] graph = new double[length][length];
         for (int i = 0; i < length; i++) {
             for(int j = 0; j < length; j++){
-                graph[i][j] = graphJSON.getJSONArray(i).getIntValue(j);
+                graph[i][j] = graphJSON.getJSONArray(i).getDoubleValue(j);
             }
         }
 
@@ -75,11 +75,11 @@ public class FuChuangController {
 
 
         //车辆三要素
-        int[] truckFee = new int[trucks.length];
+        int[] truckCost = new int[trucks.length];
         double[] truckDistance = new double[trucks.length];
         double[] truckLoad = new double[trucks.length];
         for (int i = 0; i < trucks.length; i++) {
-            truckFee[i] = trucks[i].getCost();
+            truckCost[i] = trucks[i].getCost();
             truckDistance[i] = trucks[i].getDistance();
             truckLoad[i] = trucks[i].getLoad();
         }
@@ -96,13 +96,12 @@ public class FuChuangController {
         int carVel = jsonObject.getIntValue(CAR_V);
 
 
-
         Result solve = c2JService.solve(
                 nodes.length,
                 graph,
                 demand,
                 trucks.length,
-                truckFee,
+                truckCost,
                 truckDistance,
                 truckLoad,
                 affectFullLoad,
