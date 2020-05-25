@@ -13,7 +13,7 @@ public class Result implements Comparable {
 
     private final double evaluation;
     private final double sumCost;
-    private final int sumDis;
+    private final double sumDis;
     private List<Route> routes = new ArrayList<>();
 
 
@@ -30,7 +30,7 @@ public class Result implements Comparable {
 
 
 
-    public Result(double evaluation, int sumCost, int sumDis, String route){
+    public Result(double evaluation, double sumCost, double sumDis, String route){
         this.evaluation = evaluation;
         this.sumCost = sumCost;
         this.sumDis = sumDis;
@@ -57,7 +57,7 @@ public class Result implements Comparable {
         return sumCost;
     }
 
-    public int getSumDis(){
+    public double getSumDis(){
         return sumDis;
     }
 

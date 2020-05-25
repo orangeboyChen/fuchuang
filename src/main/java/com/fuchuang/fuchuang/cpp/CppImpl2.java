@@ -50,7 +50,7 @@ public class CppImpl2 implements Cpp {
             {6,3,0,0,0,0,0,0,9,0,0},
             {5,0,0,5,2,2,0,0,0,0,0}
     };
-    double minroad[][] = new double[NODEN][NODEN];
+    double minroad[][];
     double goodsnumber[] = new double[]{
             0,1.7,0.8,1.3,2.8,1.9,3.5,0.9,0.3,1.2,0
     };
@@ -93,10 +93,10 @@ public class CppImpl2 implements Cpp {
     double[] carmax = new double[10];                     //车辆最大限制
     double[] carroad = new double[10];                 //车辆最大里程
     int[] carprice = new int[10];                   //车辆费用
-    int minprice = ALLMAX;          //最小价格
-    int minlength = ALLMAX;         //最小路程
+    double minprice = ALLMAX;          //最小价格
+    double minlength = ALLMAX;         //最小路程
 
-    singleroad[][] manzailv = new singleroad[ZQSIZE][NODEN];
+    singleroad[][] manzailv;
 //    static singleroad manzailv[ZQSIZE][NODEN] = { 0 };//满载率
 
     double[][] canshu = new double[3][ZQSIZE];      //参数和适应度（canshu[0]表示路程  canshu[1]表示总价格）
@@ -198,7 +198,7 @@ public class CppImpl2 implements Cpp {
         }
     }
 
-    double shiyingdu(int canshu, int min) {
+    double shiyingdu(int canshu, double min) {
         if (canshu > 1.4 * min) {
             return 0;
         }
@@ -725,6 +725,8 @@ public class CppImpl2 implements Cpp {
     {
         //初始化数据
         NODEN = vCnt;
+        minroad = new double[NODEN][NODEN];
+        manzailv = new singleroad[ZQSIZE][NODEN];
         xianglin = graph;
         goodsnumber = demand;
 //        carclass = carCnt;
