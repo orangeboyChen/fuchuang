@@ -83,7 +83,7 @@ class CppImplTest {
         ExecutorService executorService = Executors.newFixedThreadPool(taskSum);
 
         Callable<Result> callable = () -> {
-            Cpp cpp = new CppImpl2();
+            Cpp cpp = new CppImpl();
             return cpp.solve(11, graph, demand,
                     2, new int[]{1, 1}, new double[]{35, 35}, new double[]{2, 5},
                     40, 30, 30, 0, 0);
