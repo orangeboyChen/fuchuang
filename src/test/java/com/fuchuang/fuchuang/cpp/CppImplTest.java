@@ -2,7 +2,7 @@ package com.fuchuang.fuchuang.cpp;
 
 import com.fuchuang.fuchuang.pojo.Result;
 import org.junit.jupiter.api.Test;
-import org.omg.CORBA.TIMEOUT;
+//import org.omg.CORBA.TIMEOUT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -78,7 +78,7 @@ class CppImplTest {
 
     @Test
     void test3() throws InterruptedException, ExecutionException, TimeoutException {
-        int taskSum = 1;
+        int taskSum = 100;
         List<FutureTask<Result>> futureTasks = new ArrayList<>(taskSum);
         ExecutorService executorService = Executors.newFixedThreadPool(taskSum);
 

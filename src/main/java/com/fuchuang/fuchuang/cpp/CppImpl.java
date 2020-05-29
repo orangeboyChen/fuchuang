@@ -72,12 +72,11 @@ public class CppImpl implements Cpp {
 
     public boolean isRunning = false;
 
-    @Override
-    public Result solve(int vCnt, double[][] graph, double[] demand,
-                        int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
-                        int affectFullLoad, int affectSumDis, int affectSumCost,
-                        int fixTimeCost, int carVel){
-
+//    @Override
+public Result solve(int vCnt, double[][] graph, double[] demand,
+                    int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
+                    int affectFullLoad, int affectSumDis, int affectSumCost,
+                    int fixTimeCost, int carVel){
         this.setAll(vCnt, graph, demand, carCnt, carCost, carMaxDis, carMaxLoad, affectFullLoad, affectSumDis, affectSumCost, fixTimeCost, carVel);
         return this.startCalc();
     }
@@ -262,7 +261,10 @@ public class CppImpl implements Cpp {
         }*/
     }
 
-    public void setAll(int vCnt, double[][] graph, double[] demand, int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel)
+    public void setAll(int vCnt, double[][] graph, double[] demand,
+                       int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
+                       int affectFullLoad, int affectSumDis, int affectSumCost,
+                       int fixTimeCost, int carVel)
     {
         nodeSum = vCnt;
         sumOfCarKind = carCnt;
