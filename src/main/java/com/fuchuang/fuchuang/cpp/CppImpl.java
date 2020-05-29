@@ -73,7 +73,10 @@ public class CppImpl {
     public boolean isRunning = false;
 
 //    @Override
-    public Result solve(int vCnt, int[][] graph, int[] demand, int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) {
+public Result solve(int vCnt, double[][] graph, double[] demand,
+                    int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
+                    int affectFullLoad, int affectSumDis, int affectSumCost,
+                    int fixTimeCost, int carVel){
         this.setAll(vCnt, graph, demand, carCnt, carCost, carMaxDis, carMaxLoad, affectFullLoad, affectSumDis, affectSumCost, fixTimeCost, carVel);
         return this.startCalc();
     }
@@ -89,9 +92,9 @@ public class CppImpl {
     double[] temp1 = new double[POPULATION_SIZE];
     double[] temp2 = new double[POPULATION_SIZE];
 
-    int[][] graph;
-    int[][] minDistancesOfNodes;
-    float[] demands;
+    double[][] graph;
+    double[][] minDistancesOfNodes;
+    double[] demands;
 
     String[] tempStr1 = new String[105];
     String[] tempStr2 = new String[105];
@@ -111,10 +114,10 @@ public class CppImpl {
     int sumOfCarKind = 0;
 
     //车辆最大限制
-    float[] maxLimitationsOfCar;
+    double[] maxLimitationsOfCar;
 
     //车辆最大里程
-    float[] maxDistancesOfCar;
+    double[] maxDistancesOfCar;
 
     //车辆费用
     int[] pricesOfCar;
@@ -258,7 +261,10 @@ public class CppImpl {
         }*/
     }
 
-    public void setAll(int vCnt, int[][] graph, int[] demand, int carCnt, int[] carCost, int[] carMaxDis, int[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel)
+    public void setAll(int vCnt, double[][] graph, double[] demand,
+                       int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
+                       int affectFullLoad, int affectSumDis, int affectSumCost,
+                       int fixTimeCost, int carVel)
     {
         nodeSum = vCnt;
         sumOfCarKind = carCnt;
@@ -267,11 +273,11 @@ public class CppImpl {
         ratioOfEnergyAndDistance = affectSumDis;
         ratioOfEnergyAndPrice = affectSumCost;
 
-        this.graph = new int[nodeSum + 5][nodeSum + 5];
-        minDistancesOfNodes = new int[nodeSum + 5][nodeSum + 5];
-        demands = new float[nodeSum + 5];
-        maxLimitationsOfCar = new float[sumOfCarKind + 5];
-        maxDistancesOfCar = new float[sumOfCarKind + 5];
+        this.graph = new double[nodeSum + 5][nodeSum + 5];
+        minDistancesOfNodes = new double[nodeSum + 5][nodeSum + 5];
+        demands = new double[nodeSum + 5];
+        maxLimitationsOfCar = new double[sumOfCarKind + 5];
+        maxDistancesOfCar = new double[sumOfCarKind + 5];
         pricesOfCar = new int[sumOfCarKind + 5];
 
         for(int i = 0; i < nodeSum; i++) {
