@@ -71,21 +71,21 @@ class CppImplTest {
     void solve2(){
         Cpp cpp = new CppImpl2();
         System.out.println(cpp.solve(11, graph, demand,
-                2, new int[]{200, 400}, new double[]{35, 35}, new double[]{2, 5},
+                2, new double[]{200, 400}, new double[]{35, 35}, new double[]{2, 5},
                 40, 30, 30, 0, 0));
 
     }
 
     @Test
     void test3() throws InterruptedException, ExecutionException, TimeoutException {
-        int taskSum = 100;
+        int taskSum = 1;
         List<FutureTask<Result>> futureTasks = new ArrayList<>(taskSum);
         ExecutorService executorService = Executors.newFixedThreadPool(taskSum);
 
         Callable<Result> callable = () -> {
-            Cpp cpp = new CppImpl();
+            Cpp cpp = new CppImpl2();
             return cpp.solve(11, graph, demand,
-                    2, new int[]{1, 1}, new double[]{35, 35}, new double[]{2, 5},
+                    2, new double[]{1, 1}, new double[]{35, 35}, new double[]{2, 5},
                     40, 30, 30, 0, 0);
 
 //            return cpp.solve(graph2.length, graph2, demand3,

@@ -36,7 +36,7 @@ public class C2JService {
      * @param carVel 车辆速度
      * @return 最好的结果
      */
-    public Result solve(int vCnt, double[][] graph, double[] demand, int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) throws InterruptedException, ExecutionException, TimeoutException
+    public Result solve(int vCnt, double[][] graph, double[] demand, int carCnt, double[] carCost, double[] carMaxDis, double[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) throws InterruptedException, ExecutionException, TimeoutException
     {
         List<FutureTask<Result>> futureTasks = new ArrayList<>(taskCount);
         ExecutorService executorService = Executors.newFixedThreadPool(taskCount);

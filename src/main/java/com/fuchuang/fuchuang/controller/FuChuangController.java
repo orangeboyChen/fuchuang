@@ -75,7 +75,7 @@ public class FuChuangController {
 
 
         //车辆三要素
-        int[] truckCost = new int[trucks.length];
+        double[] truckCost = new double[trucks.length];
         double[] truckDistance = new double[trucks.length];
         double[] truckLoad = new double[trucks.length];
         for (int i = 0; i < trucks.length; i++) {
