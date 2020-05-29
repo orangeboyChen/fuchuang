@@ -26,7 +26,7 @@ public interface Cpp {
      * @return 最好的结果
      */
     public Result solve(int vCnt, double[][] graph, double[] demand,
-                        int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
+                        int carCnt, double[] carCost, double[] carMaxDis, double[] carMaxLoad,
                         int affectFullLoad, int affectSumDis, int affectSumCost,
                         int fixTimeCost, int carVel);
 }

@@ -1,6 +1,5 @@
 package com.fuchuang.fuchuang.cpp;
 
-import ch.qos.logback.classic.joran.action.LevelAction;
 import com.fuchuang.fuchuang.pojo.Result;
 import org.springframework.stereotype.Component;
 
@@ -15,13 +14,32 @@ import java.util.*;
 @Component
 public class CppImpl2 implements Cpp {
 
-    private int NODEN = 11       ;           //所有节点数
-    private int ZQSIZE = 50     ;            //种群大小
-    private int MZ = 40      ;               //满载率效能占比
-    private int LC = 30  ;                   //总路程效能占比
-    private int PR = 30   ;                  //总价格效能占比
-    private int ALLMAX = 100000   ;          //作辅助最大
-    private int MAXGEN = (NODEN-1)*10  ;     //总遗传代数
+    /**
+     * 所有节点数
+     */
+    private int NODE_SUM = 11;
+
+    /**
+     * 种群大小
+     */
+    private final int POPULATION_SIZE = 50;
+
+    /**
+     * 满载率效能占比
+     */
+    private int MZ = 40;
+
+    /**
+     * 总路程效能占比
+     */
+    private int LC = 30;
+
+    /**
+     * 总价格效能占比
+     */
+    private int PR = 30;
+    private final int ALLMAX = 100000   ;          //作辅助最大
+    private final int MAXGEN = (NODE_SUM -1)*10  ;     //总遗传代数
     private int PCHANGE = 1000     ;         //单条染色体 单种变异方式 概率倒数
     private int LEAST_REQUEST = 32   ;
     //满载率最小要求（实际上达不到并且不能太高）最大值为 MZ
@@ -35,8 +53,8 @@ public class CppImpl2 implements Cpp {
         int car = 0;
     }
 
-    double linshi[] = new double[ZQSIZE];
-    double linshi2[] = new double[ZQSIZE];
+    double linshi[] = new double[POPULATION_SIZE];
+    double linshi2[] = new double[POPULATION_SIZE];
     double xianglin[][] = new double[][]{
             {0,5,8,7,0,4,12,9,12,6,5},
             {5,0,4,0,0,0,0,0,0,3,0},
@@ -92,31 +110,31 @@ public class CppImpl2 implements Cpp {
     int carclass = 0;                        //车辆种类
     double[] carmax = new double[10];                     //车辆最大限制
     double[] carroad = new double[10];                 //车辆最大里程
-    int[] carprice = new int[10];                   //车辆费用
+    double[] carprice = new double[10];                   //车辆费用
     double minprice = ALLMAX;          //最小价格
     double minlength = ALLMAX;         //最小路程
 
     singleroad[][] manzailv;
 //    static singleroad manzailv[ZQSIZE][NODEN] = { 0 };//满载率
 
-    double[][] canshu = new double[3][ZQSIZE];      //参数和适应度（canshu[0]表示路程  canshu[1]表示总价格）
+    double[][] canshu = new double[3][POPULATION_SIZE];      //参数和适应度（canshu[0]表示路程  canshu[1]表示总价格）
 
 //    static double canshu[3][ZQSIZE] = { 0 };          //参数和适应度（canshu[0]表示路程  canshu[1]表示总价格）
 
-    String[] fudai = new String[ZQSIZE];
-    String[] zidai = new String[ZQSIZE];
+    String[] fudai = new String[POPULATION_SIZE];
+    String[] zidai = new String[POPULATION_SIZE];
 
     //    static String fudai[ZQSIZE] = { "" };             //用于存储染色体
 //    static String zidai[ZQSIZE] = { "" };             //用于存储染色体
     int bianyicishu = 0;
 
-    void init(int carclass, double[] carmax, double[] carroad, int[] carprice,
-              double[] carMaxLoad, double[] carMaxDis, int[] carCost, int carCnt) {       //初始化参数
+    void init(int carclass, double[] carmax, double[] carroad, double[] carprice,
+              double[] carMaxLoad, double[] carMaxDis, double[] carCost, int carCnt) {       //初始化参数
 
 
 
 
-        for (int i = 0; i < ZQSIZE; i++){
+        for (int i = 0; i < POPULATION_SIZE; i++){
             fudai[i] = "";
             zidai[i] = "";
             canshu[0][i] = 0;
@@ -131,7 +149,7 @@ public class CppImpl2 implements Cpp {
                 strs4[i] = "";
             }
 
-            for(int j = 0; j < NODEN; j++){
+            for(int j = 0; j < NODE_SUM; j++){
                 manzailv[i][j] = new singleroad();
             }
         }
@@ -158,8 +176,8 @@ public class CppImpl2 implements Cpp {
     }
 
     void floyd() {
-        for (int i = 0; i < NODEN; i++) {
-            for (int k = 0; k < NODEN; k++) {
+        for (int i = 0; i < NODE_SUM; i++) {
+            for (int k = 0; k < NODE_SUM; k++) {
                 if (i != k && xianglin[i][k] == 0) {
                     minroad[i][k] = ALLMAX;
                 }
@@ -168,9 +186,9 @@ public class CppImpl2 implements Cpp {
                 }
             }
         }
-        for (int k = 0; k < NODEN; k++) {
-            for (int i = 0; i < NODEN; i++) {
-                for (int j = 0; j < NODEN; j++) {
+        for (int k = 0; k < NODE_SUM; k++) {
+            for (int i = 0; i < NODE_SUM; i++) {
+                for (int j = 0; j < NODE_SUM; j++) {
                     if (minroad[i][j] > (minroad[i][k] + minroad[k][j])) {
                         minroad[i][j] = minroad[i][k] + minroad[k][j];
                     }
@@ -209,30 +227,30 @@ public class CppImpl2 implements Cpp {
 
     void createf(String[] shuzu, int carclass) {         //父代产生器 产生的染色体表现为：     gene:  A-3-4-1-A (A~Z表示种类，正整数表示配送点（中心为0）)
         int zhonglei = 0;                                      //                                    gene与gene之间用 “#” 隔开 染色体保存在数组中
-        int[] shu = new int[NODEN];
+        int[] shu = new int[NODE_SUM];
         int fuzhu3 = 0;
         int zhizhen = 0;
         String chuan = "";
         Random r = new Random(System.currentTimeMillis());
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             zhizhen = 0;
-            for (int j = 0; j < NODEN - 1; j++) {               //重新设置所有站点访问情况
+            for (int j = 0; j < NODE_SUM - 1; j++) {               //重新设置所有站点访问情况
                 shu[j] = j + 1;
             }
-            for (int j = 0; j < 2 * NODEN - 2; j++) {           //洗牌
-                fuzhu = r.nextInt(32767) % (NODEN - 1);
-                fuzhu2 = r.nextInt(32767) % (NODEN - 1);
+            for (int j = 0; j < 2 * NODE_SUM - 2; j++) {           //洗牌
+                fuzhu = r.nextInt(32767) % (NODE_SUM - 1);
+                fuzhu2 = r.nextInt(32767) % (NODE_SUM - 1);
                 fuzhu3 = shu[fuzhu];
                 shu[fuzhu] = shu[fuzhu2];
                 shu[fuzhu2] = fuzhu3;
             }
-            for (int j = 0; j < NODEN - 1; j++) {               //随机化产生路线
-                fuzhu = r.nextInt(32767) % (NODEN - 1);
+            for (int j = 0; j < NODE_SUM - 1; j++) {               //随机化产生路线
+                fuzhu = r.nextInt(32767) % (NODE_SUM - 1);
                 fuzhu++;
                 zhonglei = r.nextInt(32767) % carclass;
                 shuzu[i] += (char)(zhonglei + 'A');
                 shuzu[i] += '-';
-                if ((zhizhen + fuzhu) < NODEN - 1) {
+                if ((zhizhen + fuzhu) < NODE_SUM - 1) {
                     for (int k = zhizhen; k < zhizhen + fuzhu; k++) {
 
                         chuan = String.valueOf(shu[k]);
@@ -244,7 +262,7 @@ public class CppImpl2 implements Cpp {
                     zhizhen += fuzhu;
                 }
                 else {
-                    for (int k = zhizhen; k < NODEN - 1; k++) {
+                    for (int k = zhizhen; k < NODE_SUM - 1; k++) {
                         chuan = String.valueOf(shu[k]);
                         shuzu[i] += chuan;
                         shuzu[i] += '-';
@@ -286,10 +304,10 @@ public class CppImpl2 implements Cpp {
         double manzai = 0;                                          //                             canshu[0]中储存染色体总路程长度
         int star = 0;                                             //                             canshu[1]中储存染色体总所需价格
         int end = 0;                                              //                             canshu[0]中储存染色体总适应度
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             linshi2[i] = 1;
         }
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             zongjia = 0;
             zonglucheng = 0;
             int shu = split(shuzu[i], '#', strs);
@@ -324,10 +342,10 @@ public class CppImpl2 implements Cpp {
         }
         int jishu = 0;
         double he = 0;
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             jishu = 0;
             he = 0;
-            for (int j = 0; j < NODEN - 1; j++) {
+            for (int j = 0; j < NODE_SUM - 1; j++) {
                 if (manzailv[i][j].lc != 0) {
                     if (manzailv[i][j].lc != ALLMAX) {       //不能超路程限制
                         jishu++;
@@ -343,7 +361,7 @@ public class CppImpl2 implements Cpp {
                 }
             }
         }
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             if (linshi2[i] != 0) {
                 if (canshu[0][i] < minlength) {
                     minlength = (int)canshu[0][i];
@@ -353,7 +371,7 @@ public class CppImpl2 implements Cpp {
                 }
             }
         }
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             if (linshi2[i] == 1) {
                 canshu[2][i] += shiyingdu((int)canshu[0][i], minlength) * LC;
                 canshu[2][i] += shiyingdu((int)canshu[1][i], minprice) * PR;
@@ -366,10 +384,10 @@ public class CppImpl2 implements Cpp {
         //对调变异（染色体中的节点相互调换）
         Random r = new Random(System.currentTimeMillis());
         fuzhubianyi = "";
-        fuzhu = r.nextInt(32767) % (NODEN - 1) + 1;
-        fuzhu2 = r.nextInt(32767) % (NODEN - 1) + 1;
+        fuzhu = r.nextInt(32767) % (NODE_SUM - 1) + 1;
+        fuzhu2 = r.nextInt(32767) % (NODE_SUM - 1) + 1;
         while (fuzhu2 == fuzhu) {
-            fuzhu2 = r.nextInt(32767) % (NODEN - 1) + 1;
+            fuzhu2 = r.nextInt(32767) % (NODE_SUM - 1) + 1;
         }
         String s1 = "", s2 = "";
         s1 = String.valueOf(fuzhu);
@@ -406,13 +424,13 @@ public class CppImpl2 implements Cpp {
         char[] a = aa.toCharArray();
         Random r = new Random(System.currentTimeMillis());
         fuzhubianyi = "";
-        fuzhu = r.nextInt(32767) % (NODEN - 1) + 1;
+        fuzhu = r.nextInt(32767) % (NODE_SUM - 1) + 1;
         String s1 = "";
 
 
         s1 = String.valueOf(fuzhu);
         int dangqian = 0;
-        fuzhu2 = r.nextInt(32767) % (NODEN - 1) + 1;
+        fuzhu2 = r.nextInt(32767) % (NODE_SUM - 1) + 1;
         int yn = 0, jishu = 0;
         int gang = 0;
         for (int i = 0; i < aa.length(); i++) {
@@ -557,10 +575,10 @@ public class CppImpl2 implements Cpp {
     }
 
     void zidaishengchengqi(String[] shuzu, String[] next) {              //由父代产生子代的过程
-        for (int i = 0; i < ZQSIZE; i++) {                                          //子代染色体构造方法：1.按照适应度轮盘选择
+        for (int i = 0; i < POPULATION_SIZE; i++) {                                          //子代染色体构造方法：1.按照适应度轮盘选择
             next[i] = "";                                                           //                    2.所有满载率评价大于 LEASTREQUEST 的gene直接遗传
         }                                                                           //                    3.如果2中没有符合要求的染色体那么将满载率评价最高的gene加入子代染色体
-        for (int i = 1; i < ZQSIZE; i++) {                                          //                    4.随机化生成其余所有节点的路线
+        for (int i = 1; i < POPULATION_SIZE; i++) {                                          //                    4.随机化生成其余所有节点的路线
             canshu[2][i] += canshu[2][i - 1];
         }
         Random r = new Random(System.currentTimeMillis());
@@ -568,11 +586,11 @@ public class CppImpl2 implements Cpp {
         int max = 0;
         int yn = 0;
         int ranseti = 0;
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             ranseti = 0;
-            lunpanzhizhen = bigRand() % (int)(canshu[2][ZQSIZE - 1] * 10000);       //轮盘赌注
+            lunpanzhizhen = bigRand() % (int)(canshu[2][POPULATION_SIZE - 1] * 10000);       //轮盘赌注
             lunpanzhizhen /= 10000;
-            for (int k = 0; k < ZQSIZE; k++) {
+            for (int k = 0; k < POPULATION_SIZE; k++) {
                 if (canshu[2][k] >= lunpanzhizhen) {
                     ranseti = k;
                     break;
@@ -581,7 +599,7 @@ public class CppImpl2 implements Cpp {
             max = 0;
             yn = 0;
             fuzhu = split(shuzu[ranseti], '#', strs);
-            for (int k = 1; k < NODEN; k++) {
+            for (int k = 1; k < NODE_SUM; k++) {
                 linshi[k] = 0;
             }
             int  fuzhu3 = 0;
@@ -609,7 +627,7 @@ public class CppImpl2 implements Cpp {
             }
             int zhizhen = 0;                                //随机化生成其余所有节点的路线
             int fuzhu4 = 0;
-            for (int k = 1; k < NODEN; k++) {
+            for (int k = 1; k < NODE_SUM; k++) {
                 if (linshi[k] == 0) {
                     strs3[zhizhen] = String.valueOf(k);
                     zhizhen++;
@@ -623,7 +641,7 @@ public class CppImpl2 implements Cpp {
                 strs3[fuzhu3] = zhongjian;
             }
             int yifangwen = 0;
-            for (int k = 0; k < NODEN; k++) {
+            for (int k = 0; k < NODE_SUM; k++) {
                 if (zhizhen >= 2) {
                     fuzhu3 = r.nextInt(32767) % (zhizhen - 1) + 1;
                 }
@@ -656,8 +674,8 @@ public class CppImpl2 implements Cpp {
     int zuiyou() {                                                             //结束时在所有染色体中找到最优解
         double max = 0;
         int yn = 0, zhizhen = -1;
-        for (int i = 0; i < ZQSIZE; i++) {
-            for (int k = 0; k < NODEN; k++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
+            for (int k = 0; k < NODE_SUM; k++) {
                 if ((manzailv[i][k].manzai != 0 && manzailv[i][k].lc == ALLMAX) || (!(manzailv[i][k].manzai != 0) && manzailv[i][k].lc != 0)) { //gene载货评价不为0，gene路程不超限
                     yn = 1;
                     break;
@@ -688,17 +706,17 @@ public class CppImpl2 implements Cpp {
     }
 
     void yichuanbianyi(String[] shuzu) {          //按照 PCHANGE 对当前种群进行四种遗传变异
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             fuzhu = bigRand() % PCHANGE;
             if (fuzhu == 1) {
                 int a = 0;
                 int b = 0;
-                a = bigRand() % ZQSIZE;
-                b = bigRand() % ZQSIZE;
+                a = bigRand() % POPULATION_SIZE;
+                b = bigRand() % POPULATION_SIZE;
                 jiaocha(a, b, shuzu);
             }
         }
-        for (int i = 0; i < ZQSIZE; i++) {
+        for (int i = 0; i < POPULATION_SIZE; i++) {
             fuzhu = bigRand() % PCHANGE;
             if (fuzhu == 1) {
                 bianyi1(shuzu[i]);
@@ -719,14 +737,14 @@ public class CppImpl2 implements Cpp {
 
     @Override
     public Result solve(int vCnt, double[][] graph, double[] demand,
-                        int carCnt, int[] carCost, double[] carMaxDis, double[] carMaxLoad,
+                        int carCnt, double[] carCost, double[] carMaxDis, double[] carMaxLoad,
                         int affectFullLoad, int affectSumDis, int affectSumCost,
                         int fixTimeCost, int carVel)
     {
         //初始化数据
-        NODEN = vCnt;
-        minroad = new double[NODEN][NODEN];
-        manzailv = new singleroad[ZQSIZE][NODEN];
+        NODE_SUM = vCnt;
+        minroad = new double[NODE_SUM][NODE_SUM];
+        manzailv = new singleroad[POPULATION_SIZE][NODE_SUM];
         xianglin = graph;
         goodsnumber = demand;
 //        carclass = carCnt;
@@ -780,7 +798,7 @@ public class CppImpl2 implements Cpp {
                 // System.out.println("最终的最优解是" + fudai[cy]);
                 bestSolutionRoute = zidai[cy];
 
-                for (int i = 0; i < NODEN; i++) {
+                for (int i = 0; i < NODE_SUM; i++) {
                     if (manzailv[cy][i].manzai != 0) {
                         // System.out.println("路线参数为：" + 100 * manzailv[cy][i].manzai / MZ + "(" + manzailv[cy][i].lc + ")");
                     }
@@ -794,9 +812,9 @@ public class CppImpl2 implements Cpp {
                 // System.out.println("抱歉最终没有得到最优解");
             }
 
-            for (int i = 0; i < ZQSIZE; i++) {
+            for (int i = 0; i < POPULATION_SIZE; i++) {
                 // System.out.println(fudai[i]);
-                for (int k = 0; k < NODEN; k++) {
+                for (int k = 0; k < NODE_SUM; k++) {
                     if (manzailv[i][k].lc != 0) {
                         // System.out.println(100 * manzailv[i][k].manzai / MZ + "(" + manzailv[i][k].lc + ")" + " ");
                     }
@@ -817,7 +835,7 @@ public class CppImpl2 implements Cpp {
                 // System.out.println("最终的最优解是" + zidai[cy]);
                 bestSolutionRoute = zidai[cy];
 
-                for (int i = 0; i < NODEN; i++) {
+                for (int i = 0; i < NODE_SUM; i++) {
                     if (manzailv[cy][i].manzai != 0) {
                         // System.out.println("路线参数为：" + 100 * manzailv[cy][i].manzai / MZ + "(" + manzailv[cy][i].lc + ")");
                     }
@@ -833,9 +851,9 @@ public class CppImpl2 implements Cpp {
             }
 
 
-            for (int i = 0; i < ZQSIZE; i++) {
+            for (int i = 0; i < POPULATION_SIZE; i++) {
                 // System.out.println(zidai[i]);
-                for (int k = 0; k < NODEN; k++) {
+                for (int k = 0; k < NODE_SUM; k++) {
                     if (manzailv[i][k].lc != 0) {
                         // System.out.println(100 * manzailv[i][k].manzai / MZ + "(" + manzailv[i][k].lc + ") ");
                     }
