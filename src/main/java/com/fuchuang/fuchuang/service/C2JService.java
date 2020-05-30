@@ -3,6 +3,9 @@ package com.fuchuang.fuchuang.service;
 import com.fuchuang.fuchuang.cpp.Cpp;
 import com.fuchuang.fuchuang.cpp.CppImpl2;
 import com.fuchuang.fuchuang.pojo.Result;
+import com.sun.org.slf4j.internal.Logger;
+import com.sun.org.slf4j.internal.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,7 +21,10 @@ import java.util.concurrent.*;
 @Service
 public class C2JService {
 
-    private final int taskCount = 50;
+    @Value("${taskSum}")
+    private int taskSum;
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * 通过算法获得解
@@ -38,15 +44,15 @@ public class C2JService {
      */
     public Result solve(int vCnt, double[][] graph, double[] demand, int carCnt, double[] carCost, double[] carMaxDis, double[] carMaxLoad, int affectFullLoad, int affectSumDis, int affectSumCost, int fixTimeCost, int carVel) throws InterruptedException, ExecutionException, TimeoutException
     {
-        List<FutureTask<Result>> futureTasks = new ArrayList<>(taskCount);
-        ExecutorService executorService = Executors.newFixedThreadPool(taskCount);
+        List<FutureTask<Result>> futureTasks = new ArrayList<>(taskSum);
+        ExecutorService executorService = Executors.newFixedThreadPool(taskSum);
 
         Callable<Result> callable = () -> {
             Cpp cpp = new CppImpl2();
             return cpp.solve(vCnt, graph, demand, carCnt, carCost, carMaxDis, carMaxLoad, affectFullLoad, affectSumDis, affectSumCost, fixTimeCost, carVel);
         };
 
-        for (int i = 0; i < taskCount; i++) {
+        for (int i = 0; i < taskSum; i++) {
             FutureTask<Result> futureTask = new FutureTask<>(callable);
             futureTasks.add(futureTask);
             executorService.submit(futureTask);
@@ -62,7 +68,7 @@ public class C2JService {
             try{
                 executedResult = executedTask.get(6, TimeUnit.SECONDS);
             }catch (TimeoutException e){
-                System.out.println("线程运行异常");
+                logger.error("线程运行异常");
                 executedResult = new Result();
             }
 

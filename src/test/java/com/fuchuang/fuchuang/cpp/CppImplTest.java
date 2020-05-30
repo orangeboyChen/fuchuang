@@ -78,7 +78,7 @@ class CppImplTest {
 
     @Test
     void test3() throws InterruptedException, ExecutionException, TimeoutException {
-        int taskSum = 1;
+        int taskSum = 100;
         List<FutureTask<Result>> futureTasks = new ArrayList<>(taskSum);
         ExecutorService executorService = Executors.newFixedThreadPool(taskSum);
 
